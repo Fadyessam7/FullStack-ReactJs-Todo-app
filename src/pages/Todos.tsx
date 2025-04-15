@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import TodoSkeleton from "../components/TodoSkeleton";
 import Paginator from "../components/ui/Paginator";
 import useCustomQuery from "../hooks/useAuthenticatedQuery";
@@ -10,10 +10,12 @@ const TodosPage = () => {
   const userData = userDataString ? JSON.parse(userDataString) : null;
 
   const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [sortBy, setSortBy] = useState<string>("DESC");
 
   const { isLoading, data, isFetching } = useCustomQuery({
-    queryKey: [`todo-page-${page}`],
-    url: `/todos?pagination[pageSize]=25&pagination[page]=${page}`,
+    queryKey: [`todo-page-${page}`, `${pageSize}`, `${sortBy}`],
+    url: `/todos?pagination[pageSize]=${pageSize}&pagination[page]=${page}&sort=createdAt:${sortBy}`,
     config: {
       headers: {
         Authorization: `Bearer ${userData.jwt}`,
@@ -30,6 +32,13 @@ const TodosPage = () => {
     setPage((prev) => prev + 1);
   };
 
+  const onChangePageSizeHandler = (event: ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(+event.target.value);
+  };
+
+  const onChangeSortByHandler = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(event.target.value);
+  };
   if (isLoading)
     return (
       <div className="space-y-1">
@@ -40,7 +49,26 @@ const TodosPage = () => {
     );
   return (
     <div className="mx-24">
-      {" "}
+      <div className="flex justify-end mb-5 space-x-2">
+        <select
+          className="outline-2 rounded-md px-4 py-2"
+          value={sortBy}
+          onChange={onChangeSortByHandler}
+        >
+          <option value="DESC">Latest</option>
+          <option value="ASC">Oldest</option>
+        </select>
+        <select
+          className="outline-2 rounded-md px-4 py-2"
+          value={pageSize}
+          onChange={onChangePageSizeHandler}
+        >
+          <option disabled>page size</option>
+          <option value={10}>10</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+        </select>
+      </div>{" "}
       {data.data.length ? (
         data.data.reverse().map((todo: ITodo, index: number) => {
           return (
