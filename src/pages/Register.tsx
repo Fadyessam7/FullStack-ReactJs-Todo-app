@@ -1,16 +1,17 @@
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
 import { useForm, SubmitHandler } from "react-hook-form";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 import InputErrorMessage from "../components/ui/InputErrorMessage";
-import { REGISTER_FORM } from "../data/index";
-import { registerSchema } from "../validation/index";
+import { REGISTER_FORM } from "../data";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { registerSchema } from "../validation";
 import axiosInstance from "../config/axios.config";
 import toast from "react-hot-toast";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { IErrorResponse } from "../interfaces";
+import { useNavigate } from "react-router-dom";
+
 interface IFormInput {
   username: string;
   email: string;
@@ -19,6 +20,7 @@ interface IFormInput {
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -27,40 +29,36 @@ const RegisterPage = () => {
     resolver: yupResolver(registerSchema),
   });
 
-  // Handlers
+  //** Handlers
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    console.log("DATA", data);
+    console.log(data);
+    //** Pending
     setIsLoading(true);
 
     try {
-      //  * 2 - Fulfilled => SUCCESS => (OPTIONAL)
-
+      //** fullFilled
       const { status } = await axiosInstance.post("/auth/local/register", data);
-
       if (status === 200) {
         toast.success(
-          "You will navigate to the login page after 2 seconds to login.",
+          "You will navigate to login page after 2 seconds to login",
           {
             position: "bottom-center",
             duration: 1500,
             style: {
-              backgroundColor: "black",
+              background: "black",
               color: "white",
               width: "fit-content",
             },
           }
         );
-
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       }
     } catch (error) {
-      //  * 3 - Rejected => FAILED => (OPTIONAL)
-      console.log(error);
+      //** Rejected => Failed
       const errorObj = error as AxiosError<IErrorResponse>;
-      // console.log(error);
-      toast.error(`${errorObj.response?.data.error.message}`, {
+      toast.error(`${errorObj.response?.data?.error.message}`, {
         position: "bottom-center",
         duration: 4000,
       });
@@ -69,11 +67,11 @@ const RegisterPage = () => {
     }
   };
 
-  // Renders
+  //** Renders
   const renderRegisterForm = REGISTER_FORM.map(
-    ({ name, placeholder, type, validation }, idx) => {
+    ({ type, name, placeholder, validation }, index) => {
       return (
-        <div key={idx}>
+        <div key={index}>
           <Input
             type={type}
             placeholder={placeholder}
@@ -93,7 +91,7 @@ const RegisterPage = () => {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {renderRegisterForm}
         <Button fullWidth isLoading={isLoading}>
-          {isLoading ? "Loading... " : "Register"}
+          Register
         </Button>
       </form>
     </div>

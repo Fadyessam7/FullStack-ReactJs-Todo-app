@@ -10,9 +10,9 @@ interface IProps {
 const Paginator = ({
   page,
   pageCount,
-  onClickPrev,
-  isLoading,
   total,
+  isLoading,
+  onClickPrev,
   onClickNext,
 }: IProps) => {
   return (

@@ -1,5 +1,6 @@
 import { ILoginInput, IRegisterInput } from "../interfaces";
 
+
 export const REGISTER_FORM: IRegisterInput[] = [
   {
     name: "username",
@@ -50,3 +51,4 @@ export const LOGIN_FORM: ILoginInput[] = [
     },
   },
 ];
+
